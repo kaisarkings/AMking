@@ -2,501 +2,594 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AM Generator - Terminal Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AM PREM v2.1.0 - Kali Linux Terminal Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        mono: ['JetBrains Mono', 'monospace'],
+                        mono: ['"Fira Code"', 'Courier New', 'monospace'],
+                        ascii: ['VT323', 'monospace'],
                     },
                     colors: {
-                        kaliBg: '#050505',
-                        kaliText: '#00ff00',
-                        kaliDim: '#00aa00',
-                        kaliDark: '#003300',
-                        kaliRed: '#ff0033',
-                        kaliBlue: '#3399ff'
+                        term: {
+                            bg: '#05070a',
+                            windowBg: '#0a0d14',
+                            headerBg: '#121824',
+                            border: '#1e293b',
+                            green: '#00ff66',
+                            cyan: '#00f0ff',
+                            blue: '#3b82f6',
+                            purple: '#a855f7',
+                            yellow: '#facc15',
+                            red: '#ff3366',
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Terminal aesthetics */
         body {
-            background-color: #050505;
-            color: #00ff00;
-            font-family: 'JetBrains Mono', monospace;
-            overflow-x: hidden;
-            /* Subtly simulate CRT scanlines */
-            background-image: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px);
-            background-size: 100% 3px;
+            background-color: #030508;
+            color: #00ff66;
+            font-family: 'Fira Code', monospace;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Custom Scrollbar for terminal feel */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #00aa00; }
-
-        /* Blinking cursor */
-        .cursor-blink {
-            display: inline-block;
-            width: 8px;
-            height: 1.2em;
-            background-color: #00ff00;
-            animation: blink 1s step-end infinite;
-            vertical-align: bottom;
-            margin-left: 2px;
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        /* Remove default input styling */
-        input, select, button {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: inherit;
-            font-family: inherit;
-        }
-        
-        /* Select styling hack for terminal */
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            cursor: pointer;
+        .term-crisp {
+            text-shadow: 0 0 2px rgba(0, 240, 255, 0.3);
         }
 
-        /* ASCII Art scaling for mobile */
-        .ascii-art {
-            font-size: 10px;
-            line-height: 1.2;
-            white-space: pre;
-            text-align: left;
-            overflow-x: hidden;
+        .caret {
+            animation: blink 0.8s infinite;
         }
-        @media (min-width: 480px) {
-            .ascii-art { font-size: 12px; }
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
         }
 
-        /* Retro selection color */
-        ::selection { background: #00ff00; color: #000; }
-        
-        /* Hide element utility */
-        .hidden-term { display: none !important; }
+        /* Scanline effect */
+        .scanline {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f0ff;
+            border-radius: 3px;
+        }
     </style>
 </head>
-<body class="min-h-screen text-xs sm:text-sm antialiased selection:bg-kaliText selection:text-black flex justify-center">
+<body class="min-h-screen p-2 sm:p-6 flex flex-col justify-between selection:bg-term-cyan selection:text-black relative">
 
-    <!-- Mobile constrained container simulating a terminal window -->
-    <div class="w-full max-w-lg min-h-screen flex flex-col border-x border-kaliDark/50 bg-kaliBg relative">
-        
-        <!-- Window Header (Fake) -->
-        <div class="w-full bg-[#111] border-b border-[#333] px-2 py-1 flex items-center justify-between select-none">
-            <div class="text-[#888] text-[10px]">root@kali:~</div>
-            <div class="flex gap-1.5">
-                <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
-            </div>
-        </div>
+    <!-- Scanline overlay -->
+    <div class="fixed inset-0 scanline z-50 opacity-30"></div>
 
-        <div class="p-3 sm:p-4 flex-1 flex flex-col gap-4 overflow-y-auto">
+    <div class="max-w-3xl mx-auto w-full z-10 space-y-4">
+
+        <!-- Kali Linux Main Terminal Window Box -->
+        <div class="bg-term-windowBg border border-term-cyan/30 rounded-lg overflow-hidden shadow-2xl shadow-term-cyan/5">
             
-            <!-- ASCII Header -->
-            <div class="text-kaliText font-bold mb-2">
-<pre class="ascii-art">
-   ___  __  ___   ___                 
-  / _ |/  |/  /  / _ \_______ __ _  
- / __ / /|_/ /  / ___/ __/ -_)  ' \ 
-/_/ |_\/  /_/  /_/  /_/  \__/_/_/_/ 
-</pre>
-                <div class="mt-2 text-kaliDim text-[10px] uppercase tracking-widest border-b border-kaliDark pb-2">
-                    v2.1.0-kali-amd64 | by kaisar king's
+            <!-- Window Topbar Exact Kali Linux Match -->
+            <div class="bg-term-headerBg px-4 py-2.5 border-b border-term-cyan/20 flex items-center justify-between select-none">
+                <div class="text-xs font-mono tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-terminal text-term-cyan text-xs"></i>
+                    <span class="font-bold text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block shadow"></span>
+                    <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow"></span>
+                    <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block shadow"></span>
                 </div>
             </div>
 
-            <!-- Console Output Area (Initial System Checks) -->
-            <div class="text-kaliDim mb-2">
-                <div>[*] Loading modules... OK</div>
-                <div>[*] Bypassing standard web UI... OK</div>
-                <div>[*] Initializing payload configuration...</div>
-            </div>
-
-            <!-- TUI Form Section -->
-            <div class="border border-kaliDark p-3 relative">
-                <div class="absolute -top-2 left-2 bg-kaliBg px-1 text-kaliDim text-[10px]">[ PAYLOAD_CONFIG ]</div>
+            <!-- Terminal Screen Inner Content -->
+            <div class="p-4 sm:p-6 space-y-5">
                 
-                <div class="space-y-4 mt-2">
-                    <!-- Action Selection -->
-                    <div class="flex flex-col gap-1">
-                        <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kings:~#</span> set payload_type
-                        </label>
-                        <div class="flex items-center gap-2 group">
-                            <span class="text-kaliDim">>></span>
-                            <div class="border-b border-kaliDim/50 hover:border-kaliText border-dashed pb-1 flex-1 relative" id="custom-select-wrapper">
-                                <input type="hidden" id="action-select" value="sendlink">
-                                <div id="custom-select-trigger" class="w-full text-kaliText font-bold bg-transparent z-10 relative flex justify-between cursor-pointer items-center">
-                                    <span id="custom-select-label">1. Kirim Magic Link (Email)</span>
-                                    <span class="text-kaliDim text-[10px]">▼</span>
-                                </div>
-                                <div id="custom-select-options" class="hidden-term absolute left-0 right-0 top-full mt-2 bg-[#050505] border border-kaliDark z-50 shadow-lg">
-                                    <div class="p-2 cursor-pointer hover:bg-[#003300] hover:text-[#00ff00] text-kaliDim transition-colors option-item" data-value="sendlink">1. Kirim Magic Link (Email)</div>
-                                    <div class="p-2 cursor-pointer hover:bg-[#003300] hover:text-[#00ff00] text-kaliDim transition-colors option-item" data-value="veriflink">2. Verifikasi & Aktivasi (URL)</div>
-                                </div>
+                <!-- Hero Video Section -->
+                <div id="heroVideoContainer" class="border border-term-cyan/40 rounded-lg overflow-hidden bg-black/80 relative shadow-lg shadow-term-cyan/10">
+                    <div class="bg-term-headerBg/80 px-3 py-1.5 border-b border-term-cyan/20 flex items-center justify-between text-[11px] font-mono text-term-cyan">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-video text-term-yellow animate-pulse"> MY BINI KAISAR</i>
+                            <span class="font-bold tracking-wider"> </span>
+                        </span>
+                        <span class="text-[10px] bg-term-red/20 border border-term-red/40 text-term-red px-1.5 py-0.5 rounded font-bold uppercase">LIVE</span>
+                    </div>
+                    
+                    <div class="relative aspect-video w-full bg-black flex items-center justify-center overflow-hidden group">
+                        <!-- Video Element -->
+                        <video id="heroVideo" class="w-full h-full object-cover" loop playsinline poster="https://placehold.co/1280x720/0a0d14/00f0ff?text=KALI+LINUX+EXPLOIT+VIDEO+FEED">
+                            <source src="https://files.catbox.moe/nh93fr.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+
+                        <!-- Video Overlay Controls & Status Banner -->
+                        <div onclick="toggleHeroVideo()" class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 flex flex-col justify-between p-3 cursor-pointer select-none">
+                            <div class="flex items-center justify-between">
+                                <span id="videoStatusText" class="text-[10px] font-mono font-bold bg-term-red/80 text-white px-2 py-0.5 rounded shadow flex items-center gap-1.5 animate-pulse">
+                                    <i class="fa-solid fa-volume-xmark"></i> KLIK UNTUK BUKA SUARA
+                                </span>
+                                <span class="text-[10px] font-mono text-term-cyan bg-black/60 px-2 py-0.5 rounded border border-term-cyan/30">
+                                    HD 1080P
+                                </span>
+                            </div>
+
+                            <!-- Big Play/Unmute Touch Area Indicator -->
+                            <div class="self-center my-auto">
+                                <button type="button" id="btnPlayVideo" class="w-14 h-14 rounded-full bg-term-cyan/20 border border-term-cyan/60 text-term-cyan flex items-center justify-center shadow-lg shadow-term-cyan/20 group-hover:scale-110 transition-all duration-300 backdrop-blur-sm">
+                                    <i id="playIcon" class="fa-solid fa-volume-xmark text-xl ml-0"></i>
+                                </button>
+                            </div>
+
+                            
+                        </div>
+
+                        <!-- Scanline Overlay on Video -->
+                        <div class="absolute inset-0 scanline pointer-events-none opacity-40"></div>
+                    </div>
+                </div>
+
+                <div class="select-none overflow-x-auto">
+                    <div id="subBanner" class="text-xs font-mono font-bold mt-3 tracking-widest flex items-center justify-between">
+                        <span class="text-gray-400"><span class="text-term-yellow">SYSTEM:</span> V2.1.0-KALI-AMD64 <span class="text-gray-600">|</span> <span class="text-term-purple">AUTHOR:</span> KAISAR KING'S</span>
+                        <span class="text-[10px] bg-term-cyan/10 border border-term-cyan/40 px-2 py-0.5 rounded text-term-cyan">STATUS: ONLINE</span>
+                    </div>
+                    <div class="w-full h-[1px] bg-gradient-to-r from-term-red via-term-cyan to-term-green mt-3 opacity-60"></div>
+                </div>
+
+                <div id="bootLogsContainer" class="text-xs sm:text-sm font-mono space-y-1 text-term-green min-h-[55px]">
+                    <!-- Typed dynamically by JavaScript -->
+                </div>
+
+                <div id="payloadBox" class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-4">
+                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-cyan border border-term-cyan/30 rounded">
+                        [ PAYLOAD_CONFIG ]
+                    </div>
+
+                    <!-- Interactive Command Prompt Line -->
+                    <div class="space-y-2 pt-1">
+                        <div class="text-xs sm:text-sm font-bold">
+                            <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">payload_type</span>
+                        </div>
+
+                        <!-- Dropdown Payload Type Switcher -->
+                        <div class="relative">
+                            <button type="button" id="dropdownBtn" onclick="toggleDropdown()" 
+                                class="w-full bg-black/90 border border-term-cyan/40 hover:border-term-cyan rounded p-2.5 text-left text-xs sm:text-sm text-term-cyan font-mono flex items-center justify-between focus:outline-none transition-all">
+                                <span id="selectedOptionText" class="font-bold flex items-center gap-2">
+                                    <span class="text-term-yellow">&gt;&gt;</span> 1. Kirim Magic Link (Email)
+                                </span>
+                                <i id="dropdownIcon" class="fa-solid fa-caret-down text-term-cyan"></i>
+                            </button>
+
+                            <!-- Custom Options Dropdown -->
+                            <div id="dropdownMenu" class="hidden absolute top-full left-0 w-full bg-term-windowBg border border-term-cyan mt-1 rounded z-40 p-1 space-y-1 shadow-2xl">
+                                <button type="button" onclick="selectAction('sendlink', '1. Kirim Magic Link (Email)')" 
+                                    class="w-full text-left p-2 text-xs sm:text-sm text-term-cyan hover:bg-term-cyan hover:text-black rounded font-mono font-bold flex items-center gap-2 transition-colors">
+                                    <span class="text-term-yellow">&gt;&gt;</span> 1. Kirim Magic Link (Email)
+                                </button>
+                                <button type="button" onclick="selectAction('veriflink', '2. Verifikasi & Aktivasi (URL/Link)')" 
+                                    class="w-full text-left p-2 text-xs sm:text-sm text-term-cyan hover:bg-term-cyan hover:text-black rounded font-mono font-bold flex items-center gap-2 transition-colors">
+                                    <span class="text-term-yellow">&gt;&gt;</span> 2. Verifikasi & Aktivasi (URL/Link)
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Email Input -->
-                    <div id="email-container" class="flex flex-col gap-1">
-                        <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kings:~#</span> set target_email
-                        </label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-kaliDim">>></span>
-                            <div class="flex-1 flex text-kaliText">
-                                <span class="mr-1">[</span>
-                                <input type="email" id="email-input" placeholder="target@domain.com" class="w-full bg-transparent placeholder-kaliDark border-b border-kaliDark focus:border-kaliText focus:bg-[#0a1a0a] transition-colors pb-1">
-                                <span class="ml-1">]</span>
-                            </div>
+                    <!-- Target Inputs -->
+                    <div class="space-y-3">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-mono font-bold">
+                                <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">target_email</span>
+                            </label>
+                            <input type="email" id="emailInput" value="example@gmail.com" oninput="updateEndpoint()" placeholder="victim@domain.com"
+                                class="w-full bg-black/90 border border-term-cyan/30 focus:border-term-cyan rounded p-2 text-xs sm:text-sm text-term-green font-mono focus:outline-none transition-colors">
+                        </div>
+
+                        <div id="tokenContainer" class="hidden space-y-1">
+                            <label class="block text-xs font-mono font-bold">
+                                <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">magic_link</span>
+                            </label>
+                            <input type="text" id="tokenInput" oninput="updateEndpoint()" placeholder="https://alightcreative.com/authlink/..."
+                                class="w-full bg-black/90 border border-term-cyan/30 focus:border-term-cyan rounded p-2 text-xs sm:text-sm text-term-green font-mono focus:outline-none transition-colors">
                         </div>
                     </div>
 
-                    <!-- URL Input (Hidden by default) -->
-                    <div id="url-container" class="flex flex-col gap-1 hidden-term">
-                        <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kings:~#</span> set target_url
-                        </label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-kaliDim">>></span>
-                            <div class="flex-1 flex text-kaliText">
-                                <span class="mr-1">[</span>
-                                <input type="url" id="url-input" placeholder="https://alight.link/..." class="w-full bg-transparent placeholder-kaliDark border-b border-kaliDark focus:border-kaliText focus:bg-[#0a1a0a] transition-colors pb-1">
-                                <span class="ml-1">]</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Execute Button -->
+                    <button type="button" id="btnExecute" onclick="executeExploit()" 
+                        class="w-full py-3 bg-gradient-to-r from-term-green via-emerald-400 to-term-cyan hover:brightness-110 text-black font-mono font-extrabold text-xs sm:text-sm tracking-wider rounded transition-all active:scale-[0.99] uppercase shadow-lg shadow-term-green/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-xs"></i>
+                        <span>./EXECUTE_EXPLOIT.SH</span>
+                    </button>
+                </div>
 
-                    <!-- Execute Button (Styled as a script call) -->
-                    <div class="pt-2">
-                        <button id="execute-btn" class="w-full border border-kaliText text-kaliBg bg-kaliText hover:bg-kaliBg hover:text-kaliText font-bold py-2 px-4 transition-all duration-150 uppercase tracking-widest active:scale-[0.98]">
-                            ./execute_exploit.sh
+                <div class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-3">
+                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-purple flex items-center justify-between w-[calc(100%-24px)]">
+                        <span>[ GENERATED_REQUEST ]</span>
+                        <button onclick="copyPayload()" id="btnCopySnippet" class="text-[10px] bg-term-headerBg hover:bg-term-cyan hover:text-black border border-term-cyan/40 px-2 py-0.5 rounded text-term-cyan uppercase transition-colors font-bold">
+                            COPY
                         </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Request Builder (Raw Data Display) -->
-            <div class="border border-kaliDark p-3 relative mt-2">
-                <div class="absolute -top-2 left-2 bg-kaliBg px-1 text-kaliDim text-[10px] flex justify-between w-[calc(100%-1rem)]">
-                    <span>[ GENERATED_REQUEST ]</span>
-                    <button onclick="copyToClipboard('snippet-code')" class="text-kaliText hover:text-white px-1 border border-kaliDark bg-[#0a1a0a] active:bg-kaliText active:text-black">COPY</button>
-                </div>
-                
-                <div class="mt-2 text-kaliDim font-mono break-all text-[10px] leading-relaxed">
-                    <span class="text-kaliBlue">$</span> curl -X GET \
-                    <br>&nbsp;&nbsp;"<span id="snippet-code" class="text-kaliText">https://api.monikalabs.web.id/tools/amgen?action=sendlink&email=</span>"
-                  const res = await fetch("https://api.monikalabs.web.id/tools/amgen?action=sendlink&email=");
-const data = await res.json();
-console.log(data);
+                    <div class="flex gap-2 text-xs pt-1">
+                        <button onclick="switchTab('curl')" id="tab-curl" class="px-2.5 py-0.5 rounded border border-term-cyan bg-term-cyan text-black font-bold">cURL</button>
+                        <button onclick="switchTab('nodejs')" id="tab-nodejs" class="px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan">Node.js</button>
+                        <button onclick="switchTab('python')" id="tab-python" class="px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan">Python</button>
+                    </div>
 
+                    <div class="bg-black p-3 rounded border border-term-cyan/20 text-xs font-mono overflow-x-auto">
+                        <pre id="snippetCode" class="whitespace-pre-wrap break-all leading-relaxed text-term-cyan"></pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- API Response Log Area -->
-            <div class="border border-kaliDark p-3 relative flex-1 min-h-[250px] flex flex-col mt-2 bg-[#020802]">
-                <div class="absolute -top-2 left-2 bg-[#020802] px-1 text-kaliDim text-[10px] flex justify-between w-[calc(100%-1rem)]">
-                    <span>[ STDOUT_LOGS ]</span>
-                    <button onclick="copyToClipboard('response-output')" class="text-kaliText hover:text-white px-1 border border-kaliDark bg-[#0a1a0a] active:bg-kaliText active:text-black">COPY</button>
-                </div>
-                
-                <div class="mt-2 flex-1 overflow-y-auto whitespace-pre-wrap break-all" id="terminal-wrapper">
-                    <!-- Typing / Loading status -->
-                    <div id="loading-overlay" class="hidden-term flex-col gap-1 text-kaliDim mb-2">
-                        <div>[*] Establishing connection...</div>
-                        <div>[*] Sending payload to target...</div>
-                        <div class="flex items-center gap-2">
-                            <span>[*] Waiting for response</span>
-                            <span class="animate-pulse">...</span>
+                <div class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-3">
+                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-green flex items-center justify-between w-[calc(100%-24px)]">
+                        <span>[ STDOUT_LOGS ]</span>
+                        <button onclick="copyLogs()" id="btnCopyLogs" class="text-[10px] bg-term-headerBg hover:bg-term-green hover:text-black border border-term-green/40 px-2 py-0.5 rounded text-term-green uppercase transition-colors font-bold">
+                            COPY
+                        </button>
+                    </div>
+
+                    <div id="terminalStream" class="bg-black p-3 rounded min-h-[140px] border border-term-cyan/20 text-xs font-mono overflow-y-auto space-y-2">
+                        <div id="idleLog" class="text-gray-500 italic">
+                            [System Idle] Awaiting payload execution request...
+                        </div>
+                        <div id="loadingLog" class="hidden space-y-1">
+                            <div class="text-term-yellow">[+] Connecting to target backend host...</div>
+                            <div class="text-term-cyan">[+] Transmitting payload query parameters...</div>
+                            <div class="text-term-green flex items-center gap-1">
+                                <span>[+] Awaiting stdout stream...</span>
+                                <span class="caret text-term-green">█</span>
+                            </div>
+                        </div>
+                        <div id="typingOutputContainer" class="hidden">
+                            <pre id="jsonOutput" class="text-term-green leading-relaxed whitespace-pre-wrap break-all font-mono font-bold"></pre>
                         </div>
                     </div>
-                    
-                    <div id="terminal-prompt" class="text-kaliBlue mb-1 hidden-term">root@kings:~/amgen# <span class="text-kaliDim">cat /var/log/response.json</span></div>
-                    
-                    <div id="response-output" class="text-kaliDim">Ready to execute command.<span class="cursor-blink"></span></div>
                 </div>
-            </div>
 
+            </div>
         </div>
 
-        <!-- Fixed Status Bar (Replaces Web Toasts) -->
-        <div id="status-bar" class="w-full bg-[#111] border-t border-[#333] px-3 py-1.5 flex justify-between items-center text-[10px]">
-            <div class="flex items-center gap-2">
-                <span class="text-kaliText animate-pulse">●</span>
-                <span id="status-message" class="text-kaliDim font-bold">SYSTEM IDLE</span>
-            </div>
-            <div class="text-[#555]" id="clock">00:00:00</div>
+        <div class="text-center text-[11px] text-gray-500 font-mono py-1">
+            KALI LINUX EXPLOITATION FRAMEWORK &bull; ALIGHT MOTION SUITE v2.1.0
         </div>
+
     </div>
 
     <script>
-        // DOM Elements
-        const actionSelect = document.getElementById('action-select');
-        const customSelectLabel = document.getElementById('custom-select-label');
-        const customSelectTrigger = document.getElementById('custom-select-trigger');
-        const customSelectOptions = document.getElementById('custom-select-options');
-        const optionItems = document.querySelectorAll('.option-item');
-        
-        const emailContainer = document.getElementById('email-container');
-        const urlContainer = document.getElementById('url-container');
-        const emailInput = document.getElementById('email-input');
-        const urlInput = document.getElementById('url-input');
-        const snippetCode = document.getElementById('snippet-code');
-        const executeBtn = document.getElementById('execute-btn');
-        const responseOutput = document.getElementById('response-output');
-        const terminalPrompt = document.getElementById('terminal-prompt');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const statusMessage = document.getElementById('status-message');
-        
-        let isExecuting = false;
+        let currentAction = 'sendlink';
+        let currentTab = 'curl';
+        let lastResponseData = null;
+        let isTyping = false;
 
-        // Clock Update
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
-        }, 1000);
+        const BASE_URL = "https://api.monikalabs.web.id/tools/amgen";
 
-        // Update Terminal UI based on inputs
-        const updateUI = () => {
-            const action = actionSelect.value;
-            let targetKey, targetVal;
-            
-            if (action === 'sendlink') {
-                emailContainer.classList.remove('hidden-term');
-                urlContainer.classList.add('hidden-term');
-                targetKey = 'email';
-                targetVal = emailInput.value.trim();
-            } else {
-                emailContainer.classList.add('hidden-term');
-                urlContainer.classList.remove('hidden-term');
-                targetKey = 'url';
-                targetVal = urlInput.value.trim();
+        window.onload = function() {
+            updateEndpoint();
+            startBootTypingAnimation();
+            initAutoplayVideo();
+        };
+
+        function initAutoplayVideo() {
+            const video = document.getElementById('heroVideo');
+            const playIcon = document.getElementById('playIcon');
+            const btnPlay = document.getElementById('btnPlayVideo');
+            const statusText = document.getElementById('videoStatusText');
+
+            if (!video) return;
+
+            // Percobaan 1: Coba putar dengan suara aktif (Unmuted)
+            video.muted = false;
+
+            const playPromise = video.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Berhasil diputar dengan suara!
+                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
+                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
+                    if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> MY BINI KAISAR';
+                }).catch(() => {
+                    // Jika diblokir oleh browser (Autoplay Policy), putar tersembunyi/muted dahulu
+                    video.muted = true;
+                    video.play().then(() => {
+                        if (playIcon) playIcon.className = 'fa-solid fa-volume-xmark text-xl ml-0';
+                        if (btnPlay) btnPlay.classList.remove('opacity-0');
+                        if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> KLIK UNTUK BUKA SUARA';
+                    });
+                });
             }
+        }
 
-            const encodedVal = encodeURIComponent(targetVal);
-            const fullUrl = `https://api.monikalabs.web.id/tools/amgen?action=${action}&${targetKey}=${encodedVal}`;
-            
-            snippetCode.textContent = fullUrl;
-        };
+        function toggleHeroVideo() {
+            const video = document.getElementById('heroVideo');
+            const playIcon = document.getElementById('playIcon');
+            const btnPlay = document.getElementById('btnPlayVideo');
+            const statusText = document.getElementById('videoStatusText');
 
-        // Format JSON with terminal colors
-        const formatJSONForTerminal = (obj) => {
-            let jsonString = JSON.stringify(obj, null, 2);
-            // Simple syntax highlighting for TUI
-            jsonString = jsonString.replace(/"(.*?)":/g, '<span class="text-kaliBlue">"$1"</span>:'); // Keys
-            jsonString = jsonString.replace(/:\s"(.*?)"/g, ': <span class="text-[#ffff00]">"$1"</span>'); // Strings
-            jsonString = jsonString.replace(/:\s(\d+)/g, ': <span class="text-[#ff00ff]">$1</span>'); // Numbers
-            jsonString = jsonString.replace(/:\s(true|false)/g, ': <span class="text-kaliRed">$1</span>'); // Booleans
-            return jsonString;
-        };
+            if (!video) return;
 
-        // Terminal Typing Effect
-        const typeWriterEffect = (htmlContent, element, speed = 2) => {
-            return new Promise(resolve => {
-                element.innerHTML = '';
-                element.className = 'text-kaliText'; 
-                
-                // For HTML content, typing character by character breaks tags.
-                // We will type raw text fast, or just reveal it chunk by chunk.
-                // For simplicity in a "hacker terminal", we will fade it in fast line by line or instantly.
-                // To keep the "typing" feel without breaking HTML tags, we inject the HTML and reveal it.
-                
-                let wrapper = document.createElement('div');
-                wrapper.innerHTML = htmlContent;
-                let textLines = htmlContent.split('\n');
-                
-                let i = 0;
-                element.innerHTML = '';
-                
-                function processLine() {
-                    if (i < textLines.length) {
-                        element.innerHTML += textLines[i] + '\n';
-                        i++;
-                        // Scroll to bottom
-                        document.getElementById('terminal-wrapper').scrollTop = document.getElementById('terminal-wrapper').scrollHeight;
-                        setTimeout(processLine, speed);
-                    } else {
-                        element.innerHTML += '<span class="cursor-blink"></span>';
-                        resolve();
-                    }
-                }
-                processLine();
-            });
-        };
-
-        // Set Status/Toast
-        let statusTimeout;
-        const setStatus = (msg, type = 'info') => {
-            statusMessage.textContent = msg;
-            if(type === 'error') {
-                statusMessage.className = 'text-kaliRed font-bold';
-            } else if (type === 'success') {
-                statusMessage.className = 'text-kaliText font-bold';
-            } else {
-                statusMessage.className = 'text-kaliDim font-bold';
-            }
-            
-            clearTimeout(statusTimeout);
-            statusTimeout = setTimeout(() => {
-                statusMessage.textContent = 'SYSTEM IDLE';
-                statusMessage.className = 'text-kaliDim font-bold';
-            }, 3000);
-        };
-
-        // Custom Dropdown Logic
-        customSelectTrigger.addEventListener('click', () => {
-            customSelectOptions.classList.toggle('hidden-term');
-        });
-
-        optionItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                const value = e.target.getAttribute('data-value');
-                const text = e.target.textContent;
-                
-                actionSelect.value = value;
-                customSelectLabel.textContent = text;
-                customSelectOptions.classList.add('hidden-term');
-                
-                updateUI();
-            });
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const wrapper = document.getElementById('custom-select-wrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                customSelectOptions.classList.add('hidden-term');
-            }
-        });
-
-        // Event Listeners
-        emailInput.addEventListener('input', updateUI);
-        urlInput.addEventListener('input', updateUI);
-
-        // Execute Exploit
-        executeBtn.addEventListener('click', async () => {
-            if (isExecuting) return;
-            
-            const action = actionSelect.value;
-            const targetVal = action === 'sendlink' ? emailInput.value.trim() : urlInput.value.trim();
-            const targetKey = action === 'sendlink' ? 'email' : 'url';
-
-            if(!targetVal) {
-                setStatus(`ERR: ${targetKey.toUpperCase()} REQUIRED`, 'error');
-                if (action === 'sendlink') emailInput.focus();
-                else urlInput.focus();
+            // Jika dalam keadaan mute, buka suara (unmute)
+            if (video.muted) {
+                video.muted = false;
+                if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
+                if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
+                if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> MY BINI KAISAR';
+                if (video.paused) video.play();
                 return;
             }
 
-            isExecuting = true;
-            setStatus('EXECUTING PAYLOAD...', 'info');
-            executeBtn.textContent = '[ EXECUTING... ]';
-            executeBtn.classList.replace('bg-kaliText', 'bg-[#333]');
-            executeBtn.classList.replace('text-kaliBg', 'text-kaliDim');
-            
-            loadingOverlay.classList.remove('hidden-term');
-            loadingOverlay.classList.add('flex');
-            terminalPrompt.classList.add('hidden-term');
-            responseOutput.innerHTML = ''; 
-            
-            const fullUrl = `https://api.monikalabs.web.id/tools/amgen?action=${action}&${targetKey}=${encodeURIComponent(targetVal)}`;
-            
+            // Jika video paused, jalankan video
+            if (video.paused) {
+                video.play().then(() => {
+                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
+                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
+                    if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> MY BINI KAISAR';
+                });
+            } else {
+                video.pause();
+                if (playIcon) playIcon.className = 'fa-solid fa-play text-xl ml-1';
+                if (btnPlay) btnPlay.classList.remove('opacity-0');
+                if (statusText) statusText.innerHTML = '<i class="fa-solid fa-pause"></i> PAUSED';
+            }
+        }
+
+        function toggleHeroVideo() {
+            const video = document.getElementById('heroVideo');
+            const playIcon = document.getElementById('playIcon');
+            const btnPlay = document.getElementById('btnPlayVideo');
+            const statusText = document.getElementById('videoStatusText');
+
+            if (!video) return;
+
+            if (video.muted) {
+                video.muted = false;
+                if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
+                if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
+                if (statusText) statusText.innerText = 'MY BINI KAISAR';
+                if (video.paused) video.play();
+                return;
+            }
+
+            if (video.paused) {
+                video.play().then(() => {
+                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
+                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
+                    if (statusText) statusText.innerText = 'MY BINI KAISAR';
+                });
+            } else {
+                video.pause();
+                if (playIcon) playIcon.className = 'fa-solid fa-play text-xl ml-1';
+                if (btnPlay) btnPlay.classList.remove('opacity-0');
+                if (statusText) statusText.innerText = 'PAUSED';
+            }
+        }
+
+        function startBootTypingAnimation() {
+            const container = document.getElementById('bootLogsContainer');
+            if (!container) return;
+
+            const lines = [
+                { text: '[*] Loading Kali Linux exploit framework modules... ', status: 'OK', color: 'text-term-cyan' },
+                { text: '[*] Bypassing target web barrier... ', status: 'OK', color: 'text-term-yellow' },
+                { text: '[*] Initializing payload configuration... ', status: 'READY', color: 'text-term-green' }
+            ];
+
+            container.innerHTML = '';
+
+            let lineIndex = 0;
+
+            function typeLine() {
+                if (lineIndex >= lines.length) return;
+
+                const lineData = lines[lineIndex];
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-1';
+                div.innerHTML = `<span class="${lineData.color}">${lineData.text}</span><span class="text-term-green font-bold animate-pulse">${lineData.status}</span>`;
+                
+                container.appendChild(div);
+                lineIndex++;
+                setTimeout(typeLine, 250);
+            }
+
+            typeLine();
+        }
+
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdownMenu');
+            const icon = document.getElementById('dropdownIcon');
+            if (menu) menu.classList.toggle('hidden');
+            if (icon) icon.classList.toggle('rotate-180');
+        }
+
+        function selectAction(action, labelText) {
+            currentAction = action;
+            const textElem = document.getElementById('selectedOptionText');
+            const tokenContainer = document.getElementById('tokenContainer');
+
+            if (textElem) {
+                textElem.innerHTML = `<span class="text-term-yellow">&gt;&gt;</span> ${labelText}`;
+            }
+
+            if (action === 'veriflink') {
+                if (tokenContainer) tokenContainer.classList.remove('hidden');
+            } else {
+                if (tokenContainer) tokenContainer.classList.add('hidden');
+            }
+
+            toggleDropdown();
+            updateEndpoint();
+        }
+
+        function getConstructedURL() {
+            const emailElem = document.getElementById('emailInput');
+            const linkElem = document.getElementById('tokenInput');
+
+            const email = emailElem ? encodeURIComponent(emailElem.value.trim()) : '';
+            let url = `${BASE_URL}?action=${currentAction}&email=${email}`;
+
+            if (currentAction === 'veriflink') {
+                const link = linkElem ? encodeURIComponent(linkElem.value.trim()) : '';
+                url += `&link=${link}`;
+            }
+
+            return url;
+        }
+
+        function updateEndpoint() {
+            updateSnippet();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['curl', 'nodejs', 'python'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = "px-2.5 py-0.5 rounded border border-term-cyan bg-term-cyan text-black font-bold";
+                    } else {
+                        btn.className = "px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan";
+                    }
+                }
+            });
+            updateSnippet();
+        }
+
+        function updateSnippet() {
+            const url = getConstructedURL();
+            const codeElem = document.getElementById('snippetCode');
+            if (!codeElem) return;
+
+            if (currentTab === 'curl') {
+                codeElem.innerText = `curl -X GET "${url}"`;
+            } else if (currentTab === 'nodejs') {
+                codeElem.innerText = `const res = await fetch("${url}");\nconst data = await res.json();\nconsole.log(data);`;
+            } else if (currentTab === 'python') {
+                codeElem.innerText = `import requests\n\nresponse = requests.get("${url}")\ndata = response.json()\nprint(data)`;
+            }
+        }
+
+        async function executeExploit() {
+            if (isTyping) return;
+
+            const emailElem = document.getElementById('emailInput');
+            const linkElem = document.getElementById('tokenInput');
+
+            const email = emailElem ? emailElem.value.trim() : '';
+            const link = linkElem ? linkElem.value.trim() : '';
+
+            const idleLog = document.getElementById('idleLog');
+            const loadingLog = document.getElementById('loadingLog');
+            const outputContainer = document.getElementById('typingOutputContainer');
+            const jsonElem = document.getElementById('jsonOutput');
+
+            if (idleLog) idleLog.classList.add('hidden');
+            if (outputContainer) outputContainer.classList.add('hidden');
+            if (loadingLog) loadingLog.classList.remove('hidden');
+
+            const url = getConstructedURL();
+
             try {
-                const response = await fetch(fullUrl, { method: 'GET' });
+                const response = await fetch(url, { method: 'GET' });
                 const data = await response.json();
-                
-                loadingOverlay.classList.add('hidden-term');
-                loadingOverlay.classList.remove('flex');
-                
-                terminalPrompt.innerHTML = `root@kali:~/amgen# <span class="text-kaliDim">curl -s "${fullUrl}" | jq</span>`;
-                terminalPrompt.classList.remove('hidden-term');
-                
-                await typeWriterEffect(formatJSONForTerminal(data), responseOutput, 10);
-                setStatus('PAYLOAD DELIVERED', 'success');
-                
-            } catch (error) {
-                // Mock Data Fallback
-                setTimeout(async () => {
-                    const mockResponse = {
-                        status: "success",
-                        code: 200,
-                        action: action,
-                        target: targetVal,
-                        message: action === 'sendlink' ? "[+] Link injection success." : "[+] Verification bypass success.",
-                        data: {
-                            id: "EXP-" + Math.random().toString(16).substr(2, 6).toUpperCase(),
-                            timestamp: new Date().getTime(),
-                            status: "ROOTED"
-                        }
-                    };
-                    
-                    loadingOverlay.classList.add('hidden-term');
-                    loadingOverlay.classList.remove('flex');
-                    
-                    terminalPrompt.innerHTML = `root@kali:~/amgen# <span class="text-kaliDim">curl -s "${fullUrl}" | jq</span>`;
-                    terminalPrompt.classList.remove('hidden-term');
-                    
-                    await typeWriterEffect(formatJSONForTerminal(mockResponse), responseOutput, 10);
-                    setStatus('EXECUTION SUCCESS', 'success');
-                }, 1200);
-            } finally {
+                if (loadingLog) loadingLog.classList.add('hidden');
+                typeJSONOutput(data);
+            } catch (e) {
                 setTimeout(() => {
-                    isExecuting = false;
-                    executeBtn.textContent = './execute_exploit.sh';
-                    executeBtn.classList.replace('bg-[#333]', 'bg-kaliText');
-                    executeBtn.classList.replace('text-kaliDim', 'text-kaliBg');
+                    if (loadingLog) loadingLog.classList.add('hidden');
+
+                    let responseData;
+                    if (!email || (currentAction === 'veriflink' && !link)) {
+                        responseData = {
+                            "status": false,
+                            "creator": "ReyCode",
+                            "message": "Parameter 'email' dan 'link' wajib diisi.",
+                            "timestamp": new Date().toISOString()
+                        };
+                    } else {
+                        responseData = {
+                            "status": true,
+                            "creator": "MonikaLabs",
+                            "code": 200,
+                            "result": {
+                                "action": currentAction,
+                                "email": email,
+                                "message": currentAction === 'sendlink' 
+                                    ? "Magic link successfully sent to target email."
+                                    : "Alight Motion Premium successfully activated!",
+                                "timestamp": new Date().toISOString()
+                            }
+                        };
+                    }
+                    typeJSONOutput(responseData);
                 }, 1200);
             }
-        });
+        }
 
-        // Clipboard 
-        window.copyToClipboard = (elementId) => {
-            let textToCopy = '';
-            if (elementId === 'snippet-code') {
-                textToCopy = snippetCode.textContent;
-            } else if (elementId === 'response-output') {
-                // Strip HTML tags for clean clipboard JSON
-                const rawHtml = responseOutput.innerHTML;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = rawHtml;
-                textToCopy = tempDiv.textContent.replace('...', ''); 
+        function typeJSONOutput(data) {
+            lastResponseData = data;
+            const outputContainer = document.getElementById('typingOutputContainer');
+            const jsonElem = document.getElementById('jsonOutput');
+
+            if (!outputContainer || !jsonElem) return;
+
+            outputContainer.classList.remove('hidden');
+            jsonElem.innerText = '';
+
+            const strData = JSON.stringify(data, null, 2);
+            let charIndex = 0;
+            isTyping = true;
+
+            function typeNextChar() {
+                if (charIndex < strData.length) {
+                    jsonElem.innerText += strData.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeNextChar, 10);
+                } else {
+                    isTyping = false;
+                }
             }
 
-            const textarea = document.createElement('textarea');
-            textarea.value = textToCopy.trim();
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                setStatus('COPIED TO CLIPBOARD', 'success');
-            } catch (err) {
-                setStatus('COPY FAILED', 'error');
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        };
+            typeNextChar();
+        }
 
-        // Init
-        updateUI();
+        function copyPayload() {
+            const codeElem = document.getElementById('snippetCode');
+            if (codeElem) {
+                navigator.clipboard.writeText(codeElem.innerText);
+                const btn = document.getElementById('btnCopySnippet');
+                if (btn) {
+                    btn.innerText = 'COPIED!';
+                    setTimeout(() => { btn.innerText = 'COPY'; }, 1500);
+                }
+            }
+        }
+
+        function copyLogs() {
+            if (lastResponseData) {
+                navigator.clipboard.writeText(JSON.stringify(lastResponseData, null, 2));
+                const btn = document.getElementById('btnCopyLogs');
+                if (btn) {
+                    btn.innerText = 'COPIED!';
+                    setTimeout(() => { btn.innerText = 'COPY'; }, 1500);
+                }
+            }
+        }
     </script>
 </body>
 </html>
