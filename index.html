@@ -137,7 +137,7 @@
                     <!-- Action Selection -->
                     <div class="flex flex-col gap-1">
                         <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kali:~#</span> set payload_type
+                            <span class="text-kaliDim">root@kings:~#</span> set payload_type
                         </label>
                         <div class="flex items-center gap-2 group">
                             <span class="text-kaliDim">>></span>
@@ -158,7 +158,7 @@
                     <!-- Email Input -->
                     <div id="email-container" class="flex flex-col gap-1">
                         <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kali:~#</span> set target_email
+                            <span class="text-kaliDim">root@kings:~#</span> set target_email
                         </label>
                         <div class="flex items-center gap-2">
                             <span class="text-kaliDim">>></span>
@@ -173,7 +173,7 @@
                     <!-- URL Input (Hidden by default) -->
                     <div id="url-container" class="flex flex-col gap-1 hidden-term">
                         <label class="text-kaliBlue font-bold">
-                            <span class="text-kaliDim">root@kali:~#</span> set target_url
+                            <span class="text-kaliDim">root@kings:~#</span> set target_url
                         </label>
                         <div class="flex items-center gap-2">
                             <span class="text-kaliDim">>></span>
@@ -204,6 +204,10 @@
                 <div class="mt-2 text-kaliDim font-mono break-all text-[10px] leading-relaxed">
                     <span class="text-kaliBlue">$</span> curl -X GET \
                     <br>&nbsp;&nbsp;"<span id="snippet-code" class="text-kaliText">https://api.monikalabs.web.id/tools/amgen?action=sendlink&email=</span>"
+                  const res = await fetch("https://api.monikalabs.web.id/tools/amgen?action=sendlink&email=");
+const data = await res.json();
+console.log(data);
+
                 </div>
             </div>
 
@@ -225,7 +229,7 @@
                         </div>
                     </div>
                     
-                    <div id="terminal-prompt" class="text-kaliBlue mb-1 hidden-term">root@kali:~/amgen# <span class="text-kaliDim">cat /var/log/response.json</span></div>
+                    <div id="terminal-prompt" class="text-kaliBlue mb-1 hidden-term">root@kings:~/amgen# <span class="text-kaliDim">cat /var/log/response.json</span></div>
                     
                     <div id="response-output" class="text-kaliDim">Ready to execute command.<span class="cursor-blink"></span></div>
                 </div>
