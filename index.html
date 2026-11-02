@@ -1,595 +1,338 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM PREM by king's</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        mono: ['"Fira Code"', 'Courier New', 'monospace'],
-                        ascii: ['VT323', 'monospace'],
-                    },
-                    colors: {
-                        term: {
-                            bg: '#05070a',
-                            windowBg: '#0a0d14',
-                            headerBg: '#121824',
-                            border: '#1e293b',
-                            green: '#00ff66',
-                            cyan: '#00f0ff',
-                            blue: '#3b82f6',
-                            purple: '#a855f7',
-                            yellow: '#facc15',
-                            red: '#ff3366',
-                        }
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AM PREM by King's</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['Fira Code', 'monospace']
+          },
+          colors: {
+            term: {
+              bg: '#030508',
+              windowBg: '#0a0d14',
+              headerBg: '#121824',
+              cyan: '#00f0ff',
+              green: '#00ff66',
+              red: '#ff3366',
+              purple: '#a855f7',
+              yellow: '#facc15'
             }
+          }
         }
-    </script>
-    <style>
-        body {
-            background-color: #030508;
-            color: #00ff66;
-            font-family: 'Fira Code', monospace;
-            -webkit-font-smoothing: antialiased;
-        }
+      }
+    }
+  </script>
 
-        .term-crisp {
-            text-shadow: 0 0 2px rgba(0, 240, 255, 0.3);
-        }
+  <style>
+    body {
+      background: #030508;
+      color: #00ff66;
+      font-family: 'Fira Code', monospace;
+    }
 
-        .caret {
-            animation: blink 0.8s infinite;
-        }
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-        }
+    .scanline {
+      background: linear-gradient(
+        rgba(18,16,16,0) 50%,
+        rgba(0,0,0,.35) 50%
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
 
-        /* Scanline effect */
-        .scanline {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-        }
+    .caret {
+      animation: blink .8s infinite;
+    }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #05070a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00f0ff;
-            border-radius: 3px;
-        }
-    </style>
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .glow {
+      box-shadow: 0 0 20px rgba(0,240,255,.12);
+    }
+
+    .wa-button {
+      background: linear-gradient(90deg,#00ff66,#00f0ff);
+      transition: .25s;
+    }
+
+    .wa-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(0,255,102,.3);
+    }
+
+    .news-card {
+      transition: .25s;
+    }
+
+    .news-card:hover {
+      border-color: rgba(0,240,255,.8);
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
-<body class="min-h-screen p-2 sm:p-6 flex flex-col justify-between selection:bg-term-cyan selection:text-black relative">
 
-    <!-- Scanline overlay -->
-    <div class="fixed inset-0 scanline z-50 opacity-30"></div>
+<body class="min-h-screen p-3 sm:p-6">
 
-    <div class="max-w-3xl mx-auto w-full z-10 space-y-4">
+  <div class="fixed inset-0 scanline opacity-30 z-50"></div>
 
-        <!-- Kali Linux Main Terminal Window Box -->
-        <div class="bg-term-windowBg border border-term-cyan/30 rounded-lg overflow-hidden shadow-2xl shadow-term-cyan/5">
-            
-            <!-- Window Topbar Exact Kali Linux Match -->
-            <div class="bg-term-headerBg px-4 py-2.5 border-b border-term-cyan/20 flex items-center justify-between select-none">
-                <div class="text-xs font-mono tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-terminal text-term-cyan text-xs"></i>
-                    <span class="font-bold text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block shadow"></span>
-                    <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow"></span>
-                    <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block shadow"></span>
-                </div>
-            </div>
+  <main class="max-w-3xl mx-auto relative z-10 space-y-4">
 
-            <!-- Terminal Screen Inner Content -->
-            <div class="p-4 sm:p-6 space-y-5">
-                
-                <!-- Hero Video Section -->
-                <div id="heroVideoContainer" class="border border-term-cyan/40 rounded-lg overflow-hidden bg-black/80 relative shadow-lg shadow-term-cyan/10">
-                    <div class="bg-term-headerBg/80 px-3 py-1.5 border-b border-term-cyan/20 flex items-center justify-between text-[11px] font-mono text-term-cyan">
-                        <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-video text-term-yellow animate-pulse"> AM FREE </i>
-                            <span class="font-bold tracking-wider"> </span>
-                        </span>
-                        <span class="text-[10px] bg-term-red/20 border border-term-red/40 text-term-red px-1.5 py-0.5 rounded font-bold uppercase">LIVE</span>
-                    </div>
-                    
-                    <div class="relative aspect-video w-full bg-black flex items-center justify-center overflow-hidden group">
-                        <!-- Video Element -->
-                        <video id="heroVideo" class="w-full h-full object-cover" loop playsinline poster="https://placehold.co/1280x720/0a0d14/00f0ff?text=KALI+LINUX+EXPLOIT+VIDEO+FEED">
-                            <source src="https://files.catbox.moe/u4ir68.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+    <!-- TERMINAL WINDOW -->
+    <section class="bg-term-windowBg border border-term-cyan/30 rounded-lg overflow-hidden shadow-2xl">
 
-                        <!-- Video Overlay Controls & Status Banner -->
-                        <div onclick="toggleHeroVideo()" class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 flex flex-col justify-between p-3 cursor-pointer select-none">
-                            <div class="flex items-center justify-between">
-                                <span id="videoStatusText" class="text-[10px] font-mono font-bold bg-term-red/80 text-white px-2 py-0.5 rounded shadow flex items-center gap-1.5 animate-pulse">
-                                    <i class="fa-solid fa-volume-xmark"></i> KLIK UNTUK BUKA SUARA
-                                </span>
-                                <span class="text-[10px] font-mono text-term-cyan bg-black/60 px-2 py-0.5 rounded border border-term-cyan/30">
-                                    HD 1080P
-                                </span>
-                            </div>
+      <!-- TOPBAR -->
+      <header class="bg-term-headerBg px-4 py-3 border-b border-term-cyan/20 flex justify-between items-center">
 
-                            <!-- Big Play/Unmute Touch Area Indicator -->
-                            <div class="self-center my-auto">
-                                <button type="button" id="btnPlayVideo" class="w-14 h-14 rounded-full bg-term-cyan/20 border border-term-cyan/60 text-term-cyan flex items-center justify-center shadow-lg shadow-term-cyan/20 group-hover:scale-110 transition-all duration-300 backdrop-blur-sm">
-                                    <i id="playIcon" class="fa-solid fa-volume-xmark text-xl ml-0"></i>
-                                </button>
-                            </div>
-
-                            
-                        </div>
-
-                        <!-- Scanline Overlay on Video -->
-                        <div class="absolute inset-0 scanline pointer-events-none opacity-40"></div>
-                    </div>
-                </div>
-
-                <div class="select-none overflow-x-auto">
-                    <div id="subBanner" class="text-xs font-mono font-bold mt-3 tracking-widest flex items-center justify-between">
-                        <span class="text-gray-400"><span class="text-term-yellow">SYSTEM:</span> V2.1.0-KALI-AMD64 <span class="text-gray-600">|</span> <span class="text-term-purple">AUTHOR:</span> KAISAR KING'S</span>
-                        <span class="text-[10px] bg-term-cyan/10 border border-term-cyan/40 px-2 py-0.5 rounded text-term-cyan">STATUS: ONLINE</span>
-                    </div>
-                    <div class="w-full h-[1px] bg-gradient-to-r from-term-red via-term-cyan to-term-green mt-3 opacity-60"></div>
-                </div>
-
-                <div id="bootLogsContainer" class="text-xs sm:text-sm font-mono space-y-1 text-term-green min-h-[55px]">
-                    <!-- Typed dynamically by JavaScript -->
-                </div>
-
-                <div id="payloadBox" class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-4">
-                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-cyan border border-term-cyan/30 rounded">
-                        [ PAYLOAD_CONFIG ]
-                    </div>
-
-                    <!-- Interactive Command Prompt Line -->
-                    <div class="space-y-2 pt-1">
-                        <div class="text-xs sm:text-sm font-bold">
-                            <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">payload_type</span>
-                        </div>
-
-                        <!-- Dropdown Payload Type Switcher -->
-                        <div class="relative">
-                            <button type="button" id="dropdownBtn" onclick="toggleDropdown()" 
-                                class="w-full bg-black/90 border border-term-cyan/40 hover:border-term-cyan rounded p-2.5 text-left text-xs sm:text-sm text-term-cyan font-mono flex items-center justify-between focus:outline-none transition-all">
-                                <span id="selectedOptionText" class="font-bold flex items-center gap-2">
-                                    <span class="text-term-yellow">&gt;&gt;</span> 1. Kirim Magic Link (Email)
-                                </span>
-                                <i id="dropdownIcon" class="fa-solid fa-caret-down text-term-cyan"></i>
-                            </button>
-
-                            <!-- Custom Options Dropdown -->
-                            <div id="dropdownMenu" class="hidden absolute top-full left-0 w-full bg-term-windowBg border border-term-cyan mt-1 rounded z-40 p-1 space-y-1 shadow-2xl">
-                                <button type="button" onclick="selectAction('sendlink', '1. Kirim Magic Link (Email)')" 
-                                    class="w-full text-left p-2 text-xs sm:text-sm text-term-cyan hover:bg-term-cyan hover:text-black rounded font-mono font-bold flex items-center gap-2 transition-colors">
-                                    <span class="text-term-yellow">&gt;&gt;</span> 1. Kirim Magic Link (Email)
-                                </button>
-                                <button type="button" onclick="selectAction('veriflink', '2. Verifikasi & Aktivasi (URL/Link)')" 
-                                    class="w-full text-left p-2 text-xs sm:text-sm text-term-cyan hover:bg-term-cyan hover:text-black rounded font-mono font-bold flex items-center gap-2 transition-colors">
-                                    <span class="text-term-yellow">&gt;&gt;</span> 2. Verifikasi & Aktivasi (URL/Link)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Target Inputs -->
-                    <div class="space-y-3">
-                        <div class="space-y-1">
-                            <label class="block text-xs font-mono font-bold">
-                                <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">target_email</span>
-                            </label>
-                            <input type="email" id="emailInput" value="example@gmail.com" oninput="updateEndpoint()" placeholder="victim@domain.com"
-                                class="w-full bg-black/90 border border-term-cyan/30 focus:border-term-cyan rounded p-2 text-xs sm:text-sm text-term-green font-mono focus:outline-none transition-colors">
-                        </div>
-
-                        <div id="tokenContainer" class="hidden space-y-1">
-                            <label class="block text-xs font-mono font-bold">
-                                <span class="text-term-red">root</span><span class="text-gray-400">@</span><span class="text-term-cyan">kings</span><span class="text-gray-400">:~#</span> <span class="text-term-blue">set</span> <span class="text-term-purple">magic_link</span>
-                            </label>
-                            <input type="text" id="tokenInput" oninput="updateEndpoint()" placeholder="https://alightcreative.com/authlink/..."
-                                class="w-full bg-black/90 border border-term-cyan/30 focus:border-term-cyan rounded p-2 text-xs sm:text-sm text-term-green font-mono focus:outline-none transition-colors">
-                        </div>
-                    </div>
-
-                    <!-- Execute Button -->
-                    <button type="button" id="btnExecute" onclick="executeExploit()" 
-                        class="w-full py-3 bg-gradient-to-r from-term-green via-emerald-400 to-term-cyan hover:brightness-110 text-black font-mono font-extrabold text-xs sm:text-sm tracking-wider rounded transition-all active:scale-[0.99] uppercase shadow-lg shadow-term-green/20 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play text-xs"></i>
-                        <span>./EXECUTE_EXPLOIT.SH</span>
-                    </button>
-                </div>
-
-                <div class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-3">
-                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-purple flex items-center justify-between w-[calc(100%-24px)]">
-                        <span>[ GENERATED_REQUEST ]</span>
-                        <button onclick="copyPayload()" id="btnCopySnippet" class="text-[10px] bg-term-headerBg hover:bg-term-cyan hover:text-black border border-term-cyan/40 px-2 py-0.5 rounded text-term-cyan uppercase transition-colors font-bold">
-                            COPY
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2 text-xs pt-1">
-                        <button onclick="switchTab('curl')" id="tab-curl" class="px-2.5 py-0.5 rounded border border-term-cyan bg-term-cyan text-black font-bold">cURL</button>
-                        <button onclick="switchTab('nodejs')" id="tab-nodejs" class="px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan">Node.js</button>
-                        <button onclick="switchTab('python')" id="tab-python" class="px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan">Python</button>
-                    </div>
-
-                    <div class="bg-black p-3 rounded border border-term-cyan/20 text-xs font-mono overflow-x-auto">
-                        <pre id="snippetCode" class="whitespace-pre-wrap break-all leading-relaxed text-term-cyan"></pre>
-                    </div>
-                </div>
-
-                <div class="border border-term-cyan/30 p-4 rounded-md relative bg-black/60 space-y-3">
-                    <div class="absolute -top-2.5 left-3 bg-term-windowBg px-2 text-[11px] font-mono font-bold text-term-green flex items-center justify-between w-[calc(100%-24px)]">
-                        <span>[ STDOUT_LOGS ]</span>
-                        <button onclick="copyLogs()" id="btnCopyLogs" class="text-[10px] bg-term-headerBg hover:bg-term-green hover:text-black border border-term-green/40 px-2 py-0.5 rounded text-term-green uppercase transition-colors font-bold">
-                            COPY
-                        </button>
-                    </div>
-
-                    <div id="terminalStream" class="bg-black p-3 rounded min-h-[140px] border border-term-cyan/20 text-xs font-mono overflow-y-auto space-y-2">
-                        <div id="idleLog" class="text-gray-500 italic">
-                            [System Idle] Awaiting payload execution request...
-                        </div>
-                        <div id="loadingLog" class="hidden space-y-1">
-                            <div class="text-term-yellow">[+] Connecting to target backend host...</div>
-                            <div class="text-term-cyan">[+] Transmitting payload query parameters...</div>
-                            <div class="text-term-green flex items-center gap-1">
-                                <span>[+] Awaiting stdout stream...</span>
-                                <span class="caret text-term-green">█</span>
-                            </div>
-                        </div>
-                        <div id="typingOutputContainer" class="hidden">
-                            <pre id="jsonOutput" class="text-term-green leading-relaxed whitespace-pre-wrap break-all font-mono font-bold"></pre>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+        <div class="text-xs flex items-center gap-2">
+          <i class="fa-solid fa-terminal text-term-cyan"></i>
+          <span class="text-term-red font-bold">root</span>
+          <span class="text-gray-500">@</span>
+          <span class="text-term-cyan">kings</span>
+          <span class="text-gray-500">:~#</span>
         </div>
 
-        <div class="text-center text-[11px] text-gray-500 font-mono py-1">
-            KALI LINUX EXPLOITATION FRAMEWORK &bull; ALIGHT MOTION  v1096
+        <div class="flex gap-2">
+          <span class="w-3 h-3 rounded-full bg-red-500"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+          <span class="w-3 h-3 rounded-full bg-green-500"></span>
         </div>
 
-    </div>
+      </header>
 
-    <script>
-        let currentAction = 'sendlink';
-        let currentTab = 'curl';
-        let lastResponseData = null;
-        let isTyping = false;
+      <div class="p-4 sm:p-6 space-y-6">
 
-        const BASE_URL = "https://api.monikalabs.web.id/tools/amgen";
+        <!-- BRAND -->
+        <div class="text-center space-y-2 py-4">
 
-        window.onload = function() {
-            updateEndpoint();
-            startBootTypingAnimation();
-            initAutoplayVideo();
-        };
+          <div class="inline-flex items-center gap-2 text-term-cyan text-xs border border-term-cyan/30 px-3 py-1 rounded-full">
+            <i class="fa-solid fa-shield-halved"></i>
+            KING'S EXCLUSIVE ACCESS
+          </div>
 
-        function initAutoplayVideo() {
-            const video = document.getElementById('heroVideo');
-            const playIcon = document.getElementById('playIcon');
-            const btnPlay = document.getElementById('btnPlayVideo');
-            const statusText = document.getElementById('videoStatusText');
+          <h1 class="text-4xl sm:text-5xl font-bold text-term-green tracking-wider">
+            AM PREM
+          </h1>
 
-            if (!video) return;
+          <p class="text-xs text-gray-400 tracking-widest">
+            PREMIUM ACCESS BY KING'S
+          </p>
 
-            // Percobaan 1: Coba putar dengan suara aktif (Unmuted)
-            video.muted = false;
+          <div class="flex justify-center gap-2 items-center text-[10px] pt-2">
+            <span class="w-2 h-2 bg-term-green rounded-full animate-pulse"></span>
+            <span class="text-term-green">SYSTEM ONLINE</span>
+            <span class="text-gray-600">|</span>
+            <span class="text-term-cyan">VERSION 2.1.0</span>
+          </div>
 
-            const playPromise = video.play();
+        </div>
 
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    // Berhasil diputar dengan suara!
-                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
-                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
-                    if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> BY KAISAR';
-                }).catch(() => {
-                    // Jika diblokir oleh browser (Autoplay Policy), putar tersembunyi/muted dahulu
-                    video.muted = true;
-                    video.play().then(() => {
-                        if (playIcon) playIcon.className = 'fa-solid fa-volume-xmark text-xl ml-0';
-                        if (btnPlay) btnPlay.classList.remove('opacity-0');
-                        if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> KLIK UNTUK BUKA SUARA';
-                    });
-                });
-            }
-        }
+        <!-- LOCKED ACCESS -->
+        <div class="border border-term-red/40 rounded-lg p-5 bg-term-red/5 text-center space-y-4 glow">
 
-        function toggleHeroVideo() {
-            const video = document.getElementById('heroVideo');
-            const playIcon = document.getElementById('playIcon');
-            const btnPlay = document.getElementById('btnPlayVideo');
-            const statusText = document.getElementById('videoStatusText');
+          <div class="w-16 h-16 mx-auto rounded-full border border-term-red/50 bg-term-red/10 flex items-center justify-center">
+            <i class="fa-solid fa-lock text-3xl text-term-red"></i>
+          </div>
 
-            if (!video) return;
+          <div>
+            <div class="text-term-red text-xs font-bold tracking-widest">
+              [ ACCESS RESTRICTED ]
+            </div>
 
-            // Jika dalam keadaan mute, buka suara (unmute)
-            if (video.muted) {
-                video.muted = false;
-                if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
-                if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
-                if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> MY BINI KAISAR';
-                if (video.paused) video.play();
-                return;
-            }
+            <h2 class="text-xl font-bold text-white mt-2">
+              AKSES SEDANG TERKUNCI
+            </h2>
 
-            // Jika video paused, jalankan video
-            if (video.paused) {
-                video.play().then(() => {
-                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
-                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
-                    if (statusText) statusText.innerHTML = '<i class="fa-solid fa-volume-high"></i> MY BINI KAISAR';
-                });
-            } else {
-                video.pause();
-                if (playIcon) playIcon.className = 'fa-solid fa-play text-xl ml-1';
-                if (btnPlay) btnPlay.classList.remove('opacity-0');
-                if (statusText) statusText.innerHTML = '<i class="fa-solid fa-pause"></i> PAUSED';
-            }
-        }
+            <p class="text-xs text-gray-400 mt-3 leading-relaxed">
+              Selamat datang di AM PREM by King's.
+              Untuk mendapatkan informasi dan akses AM Premium,
+              silakan bergabung terlebih dahulu ke komunitas
+              WhatsApp resmi kami.
+            </p>
+          </div>
 
-        function toggleHeroVideo() {
-            const video = document.getElementById('heroVideo');
-            const playIcon = document.getElementById('playIcon');
-            const btnPlay = document.getElementById('btnPlayVideo');
-            const statusText = document.getElementById('videoStatusText');
+          <div class="border-t border-term-red/20 pt-3 text-[10px] text-gray-500">
+            <p>AUTHENTICATION REQUIRED</p>
+            <p class="mt-1">PLEASE JOIN KING'S COMMUNITY</p>
+          </div>
 
-            if (!video) return;
+        </div>
 
-            if (video.muted) {
-                video.muted = false;
-                if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
-                if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
-                if (statusText) statusText.innerText = 'MY BINI KAISAR';
-                if (video.paused) video.play();
-                return;
-            }
+        <!-- NEWS SECTION -->
+        <section class="space-y-3">
 
-            if (video.paused) {
-                video.play().then(() => {
-                    if (playIcon) playIcon.className = 'fa-solid fa-pause text-xl ml-0';
-                    if (btnPlay) btnPlay.classList.add('opacity-0', 'hover:opacity-100');
-                    if (statusText) statusText.innerText = ' BY KAISAR ';
-                });
-            } else {
-                video.pause();
-                if (playIcon) playIcon.className = 'fa-solid fa-play text-xl ml-1';
-                if (btnPlay) btnPlay.classList.remove('opacity-0');
-                if (statusText) statusText.innerText = 'PAUSED';
-            }
-        }
+          <div class="flex justify-between items-center border-b border-term-cyan/30 pb-2">
 
-        function startBootTypingAnimation() {
-            const container = document.getElementById('bootLogsContainer');
-            if (!container) return;
+            <h3 class="text-sm font-bold text-term-cyan">
+              <i class="fa-solid fa-newspaper mr-2"></i>
+              LATEST NEWS
+            </h3>
 
-            const lines = [
-                { text: '[*] Loading Kali Linux exploit framework modules... ', status: 'OK', color: 'text-term-cyan' },
-                { text: '[*] Bypassing target web barrier... ', status: 'OK', color: 'text-term-yellow' },
-                { text: '[*] Initializing payload configuration... ', status: 'READY', color: 'text-term-green' }
-            ];
+            <span class="text-[9px] text-term-green animate-pulse">
+              ● LIVE UPDATE
+            </span>
 
-            container.innerHTML = '';
+          </div>
 
-            let lineIndex = 0;
+          <!-- NEWS 1 -->
+          <article class="news-card border border-term-cyan/20 rounded-lg p-4 bg-black/40 space-y-2">
 
-            function typeLine() {
-                if (lineIndex >= lines.length) return;
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] text-term-yellow">
+                <i class="fa-solid fa-bullhorn mr-1"></i>
+                ANNOUNCEMENT
+              </span>
 
-                const lineData = lines[lineIndex];
-                const div = document.createElement('div');
-                div.className = 'flex items-center gap-1';
-                div.innerHTML = `<span class="${lineData.color}">${lineData.text}</span><span class="text-term-green font-bold animate-pulse">${lineData.status}</span>`;
-                
-                container.appendChild(div);
-                lineIndex++;
-                setTimeout(typeLine, 250);
-            }
+              <span class="text-[9px] text-gray-500">
+                KING'S STORE
+              </span>
+            </div>
 
-            typeLine();
-        }
+            <h4 class="text-sm font-bold text-white">
+              AM PREMIUM ACCESS IS OPEN!
+            </h4>
 
-        function toggleDropdown() {
-            const menu = document.getElementById('dropdownMenu');
-            const icon = document.getElementById('dropdownIcon');
-            if (menu) menu.classList.toggle('hidden');
-            if (icon) icon.classList.toggle('rotate-180');
-        }
+            <p class="text-xs text-gray-400 leading-relaxed">
+              Kabar terbaru untuk pengguna Alight Motion!
+              Informasi mengenai AM Premium, panduan akses,
+              dan update selanjutnya akan diumumkan melalui
+              grup WhatsApp resmi King's.
+            </p>
 
-        function selectAction(action, labelText) {
-            currentAction = action;
-            const textElem = document.getElementById('selectedOptionText');
-            const tokenContainer = document.getElementById('tokenContainer');
+            <div class="text-[10px] text-term-cyan pt-1">
+              [ READ MORE IN COMMUNITY ]
+            </div>
 
-            if (textElem) {
-                textElem.innerHTML = `<span class="text-term-yellow">&gt;&gt;</span> ${labelText}`;
-            }
+          </article>
 
-            if (action === 'veriflink') {
-                if (tokenContainer) tokenContainer.classList.remove('hidden');
-            } else {
-                if (tokenContainer) tokenContainer.classList.add('hidden');
-            }
+          <!-- NEWS 2 -->
+          <article class="news-card border border-term-cyan/20 rounded-lg p-4 bg-black/40 space-y-2">
 
-            toggleDropdown();
-            updateEndpoint();
-        }
+            <div class="text-[10px] text-term-purple">
+              <i class="fa-solid fa-circle-info mr-1"></i>
+              INFORMATION
+            </div>
 
-        function getConstructedURL() {
-            const emailElem = document.getElementById('emailInput');
-            const linkElem = document.getElementById('tokenInput');
+            <h4 class="text-sm font-bold text-white">
+              HOW TO GET AM PREMIUM?
+            </h4>
 
-            const email = emailElem ? encodeURIComponent(emailElem.value.trim()) : '';
-            let url = `${BASE_URL}?action=${currentAction}&email=${email}`;
+            <p class="text-xs text-gray-400 leading-relaxed">
+              Semua informasi dan instruksi mendapatkan AM Premium
+              tersedia melalui komunitas WhatsApp.
+              Pastikan kamu mengikuti pengumuman terbaru agar
+              tidak ketinggalan informasi.
+            </p>
 
-            if (currentAction === 'veriflink') {
-                const link = linkElem ? encodeURIComponent(linkElem.value.trim()) : '';
-                url += `&link=${link}`;
-            }
+          </article>
 
-            return url;
-        }
+        </section>
 
-        function updateEndpoint() {
-            updateSnippet();
-        }
+        <!-- ACCESS BUTTON -->
+        <section class="border border-term-green/30 rounded-lg p-4 bg-term-green/5 space-y-4">
 
-        function switchTab(tab) {
-            currentTab = tab;
-            ['curl', 'nodejs', 'python'].forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                if (btn) {
-                    if (t === tab) {
-                        btn.className = "px-2.5 py-0.5 rounded border border-term-cyan bg-term-cyan text-black font-bold";
-                    } else {
-                        btn.className = "px-2.5 py-0.5 rounded border border-term-cyan/30 text-term-cyan/70 hover:text-term-cyan";
-                    }
-                }
-            });
-            updateSnippet();
-        }
+          <div class="text-center space-y-2">
 
-        function updateSnippet() {
-            const url = getConstructedURL();
-            const codeElem = document.getElementById('snippetCode');
-            if (!codeElem) return;
+            <i class="fa-brands fa-whatsapp text-4xl text-green-500"></i>
 
-            if (currentTab === 'curl') {
-                codeElem.innerText = `curl -X GET "${url}"`;
-            } else if (currentTab === 'nodejs') {
-                codeElem.innerText = `const res = await fetch("${url}");\nconst data = await res.json();\nconsole.log(data);`;
-            } else if (currentTab === 'python') {
-                codeElem.innerText = `import requests\n\nresponse = requests.get("${url}")\ndata = response.json()\nprint(data)`;
-            }
-        }
+            <h3 class="text-white font-bold text-sm">
+              GET YOUR AM PREMIUM
+            </h3>
 
-        async function executeExploit() {
-            if (isTyping) return;
+            <p class="text-[11px] text-gray-400">
+              Bergabung ke grup WhatsApp King's untuk mendapatkan
+              informasi dan panduan akses AM Premium.
+            </p>
 
-            const emailElem = document.getElementById('emailInput');
-            const linkElem = document.getElementById('tokenInput');
+          </div>
 
-            const email = emailElem ? emailElem.value.trim() : '';
-            const link = linkElem ? linkElem.value.trim() : '';
+          <a
+            href="https://chat.whatsapp.com/HES9YPKSjRB81ejnrsxLzP"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="wa-button w-full py-3 rounded flex justify-center items-center gap-2 text-black font-bold text-xs tracking-wider"
+          >
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+            JOIN WHATSAPP GROUP
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
 
-            const idleLog = document.getElementById('idleLog');
-            const loadingLog = document.getElementById('loadingLog');
-            const outputContainer = document.getElementById('typingOutputContainer');
-            const jsonElem = document.getElementById('jsonOutput');
+          <div class="text-center text-[9px] text-gray-500">
+            <i class="fa-solid fa-shield-halved mr-1"></i>
+            OFFICIAL KING'S COMMUNITY
+          </div>
 
-            if (idleLog) idleLog.classList.add('hidden');
-            if (outputContainer) outputContainer.classList.add('hidden');
-            if (loadingLog) loadingLog.classList.remove('hidden');
+        </section>
 
-            const url = getConstructedURL();
+        <!-- SYSTEM LOG -->
+        <section class="border border-term-cyan/20 rounded-lg bg-black/60 p-3 space-y-2">
 
-            try {
-                const response = await fetch(url, { method: 'GET' });
-                const data = await response.json();
-                if (loadingLog) loadingLog.classList.add('hidden');
-                typeJSONOutput(data);
-            } catch (e) {
-                setTimeout(() => {
-                    if (loadingLog) loadingLog.classList.add('hidden');
+          <div class="text-[10px] text-term-purple font-bold">
+            [ SYSTEM_LOGS ]
+          </div>
 
-                    let responseData;
-                    if (!email || (currentAction === 'veriflink' && !link)) {
-                        responseData = {
-                            "status": false,
-                            "creator": "ReyCode",
-                            "message": "Parameter 'email' dan 'link' wajib diisi.",
-                            "timestamp": new Date().toISOString()
-                        };
-                    } else {
-                        responseData = {
-                            "status": true,
-                            "creator": "MonikaLabs",
-                            "code": 200,
-                            "result": {
-                                "action": currentAction,
-                                "email": email,
-                                "message": currentAction === 'sendlink' 
-                                    ? "Magic link successfully sent to target email."
-                                    : "Alight Motion Premium successfully activated!",
-                                "timestamp": new Date().toISOString()
-                            }
-                        };
-                    }
-                    typeJSONOutput(responseData);
-                }, 1200);
-            }
-        }
+          <div id="logs" class="text-[10px] space-y-1 text-gray-400">
+          </div>
 
-        function typeJSONOutput(data) {
-            lastResponseData = data;
-            const outputContainer = document.getElementById('typingOutputContainer');
-            const jsonElem = document.getElementById('jsonOutput');
+          <div class="text-term-green text-[10px]">
+            root@kings:~# <span class="caret">█</span>
+          </div>
 
-            if (!outputContainer || !jsonElem) return;
+        </section>
 
-            outputContainer.classList.remove('hidden');
-            jsonElem.innerText = '';
+      </div>
+    </section>
 
-            const strData = JSON.stringify(data, null, 2);
-            let charIndex = 0;
-            isTyping = true;
+    <!-- FOOTER -->
+    <footer class="text-center space-y-2 py-3">
 
-            function typeNextChar() {
-                if (charIndex < strData.length) {
-                    jsonElem.innerText += strData.charAt(charIndex);
-                    charIndex++;
-                    setTimeout(typeNextChar, 10);
-                } else {
-                    isTyping = false;
-                }
-            }
+      <p class="text-[10px] text-gray-500">
+        AM PREM ACCESS SYSTEM
+      </p>
 
-            typeNextChar();
-        }
+      <p class="text-[10px] text-term-cyan">
+        POWERED BY KING'S STORE
+      </p>
 
-        function copyPayload() {
-            const codeElem = document.getElementById('snippetCode');
-            if (codeElem) {
-                navigator.clipboard.writeText(codeElem.innerText);
-                const btn = document.getElementById('btnCopySnippet');
-                if (btn) {
-                    btn.innerText = 'COPIED!';
-                    setTimeout(() => { btn.innerText = 'COPY'; }, 1500);
-                }
-            }
-        }
+      <p class="text-[9px] text-gray-700">
+        © 2026 KING'S. ALL RIGHTS RESERVED.
+      </p>
 
-        function copyLogs() {
-            if (lastResponseData) {
-                navigator.clipboard.writeText(JSON.stringify(lastResponseData, null, 2));
-                const btn = document.getElementById('btnCopyLogs');
-                if (btn) {
-                    btn.innerText = 'COPIED!';
-                    setTimeout(() => { btn.innerText = 'COPY'; }, 1500);
-                }
-            }
-        }
-    </script>
+    </footer>
+
+  </main>
+
+  <script>
+    // SYSTEM BOOT LOGS
+    const logMessages = [
+      "[+] Initializing King's access system...",
+      "[+] Loading announcement module...",
+      "[+] Checking community access...",
+      "[!] Authentication required.",
+      "[+] Waiting for user interaction..."
+    ];
+
+    const logs = document.getElementById("logs");
+
+    logMessages.forEach((message, index) => {
+      setTimeout(() => {
+        const line = document.createElement("div");
+        line.textContent = message;
+        logs.appendChild(line);
+      }, index * 400);
+    });
+  </script>
+
 </body>
 </html>
